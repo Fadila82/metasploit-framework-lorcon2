@@ -13,19 +13,6 @@ require_relative 'ieee80211'
 
 
 
-
-class DeviceInfos
-  def initialize(macAddress = "")
-    if (macAddress == nil)
-      print "Error has to be handled here\n"
-    end
-    # should check addr format
-    @macAddress = macAddress
-  end
-  attr_accessor :macAddress
-end
-
-
 class MetasploitModule < Msf::Auxiliary
 
     
@@ -49,7 +36,6 @@ class MetasploitModule < Msf::Auxiliary
 
   
   def run
-
     print_status("Open wireless interface")
 
     open_wifi
