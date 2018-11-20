@@ -69,17 +69,45 @@ class InformationElement
     @content_as_string = content_as_string
     tab = @content_as_string.unpack('CCa*')
     if tab.length == 3
-      @id = tab[0]
+      @id = tab[0].to_i()
       @length = tab[1].to_i()
       tab2 = tab[2].unpack('a'+ @length.to_s() + 'a*')
+      if tab2.length > 0
+        @value = tab2[0]
+      end
     end # TODO: raise error 
-    print "IE :=== "
-    print tab
-    print "\n"
-    print "Value == "
-    print tab2
+  end
+
+  def self.extractInformationElements(content_as_string)
+    info_element_list = []
+    to_be_parsed = content_as_string
+
+    while to_be_parsed != nil
+      infoElement = InformationElement.new(to_be_parsed)
+      info_element_list.push(infoElement)
+      # skip the info element and go to the next one
+      infoElementTotalLength = infoElement.length + 2 # id and length fields 
+      to_be_parsed_exploded = to_be_parsed.unpack('x' + infoElementTotalLength.to_s() + 'a*')
+      if to_be_parsed_exploded.length == 2
+        to_be_parsed = to_be_parsed_exploded[1]
+      else
+        to_be_parsed = nil
+      end
+    end
+
+    return info_element_list
+  end
+
+  def print_element
+    print "IE :=== ID: "
+    print @id
+    print " - length: "
+    print @length
+    print " - Value "
+    print @value
     print "\n"
   end
+
   attr_accessor :id
   attr_accessor :length
   attr_accessor :value
@@ -92,9 +120,12 @@ class ManagementFrame
   def initialize(content_as_string = "")
     @content_as_string = content_as_string
     @frame80211 = Frame80211.new(@content_as_string)
-    infoElement = InformationElement.new(@frame80211.payload)
     # TODO: error if not management type
+    @informationElements = InformationElement.extractInformationElements(@frame80211.payload)
   end
 
   attr_accessor :frame80211
+  attr_accessor :informationElements
 end
+
+

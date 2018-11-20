@@ -11,8 +11,6 @@ class RadioTap
     @header_length = tab[2]
     # compute payload from the retrieved header length
     tab = @content_as_string.unpack('x' + @header_length.to_s + 'a*')
-    print tab.length
-    print "\n"
     @payload = tab[0]
   end
   attr_accessor :header_length
